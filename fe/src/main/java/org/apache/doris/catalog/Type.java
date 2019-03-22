@@ -166,6 +166,7 @@ public abstract class Type {
         return isScalarType(PrimitiveType.DECIMAL);
     }
 
+    public boolean isHll() { return isScalarType(PrimitiveType.HLL); }
     public boolean isDecimalOrNull() { return isDecimal() || isNull(); }
     public boolean isFullySpecifiedDecimal() { return false; }
     public boolean isWildcardDecimal() { return false; }

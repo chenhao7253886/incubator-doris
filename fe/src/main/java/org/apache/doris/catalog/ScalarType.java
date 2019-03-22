@@ -568,7 +568,7 @@ public class ScalarType extends Type {
      */
     public static ScalarType getAssignmentCompatibleType(
             ScalarType t1, ScalarType t2, boolean strict) {
-        if (!t1.isValid() || !t2.isValid()) {
+        if (!t1.isValid() || !t2.isValid() || t1.isHll() || t2.isHll()) {
             return INVALID;
         }
         if (t1.equals(t2)) {
@@ -581,24 +581,13 @@ public class ScalarType extends Type {
             return t1;
         }
 
-        if (t1.type == PrimitiveType.VARCHAR || t2.type == PrimitiveType.VARCHAR) {
-            if (t1.isStringType() && t2.isStringType()) {
+        final boolean isStr1 = t1.isStringType();
+        final boolean isStr2 = t2.isStringType();
+        if (isStr1 || isStr2) {
+            if (isStr1 && isStr2) {
                 return createVarcharType(Math.max(t1.len, t2.len));
             }
-            return INVALID;
-        }
-
-        if (t1.type == PrimitiveType.HLL || t2.type == PrimitiveType.HLL) {
-                return createHllType();
-        } 
-
-        if (t1.type == PrimitiveType.CHAR || t2.type == PrimitiveType.CHAR) {
-            Preconditions.checkState(t1.type != PrimitiveType.VARCHAR);
-            Preconditions.checkState(t2.type != PrimitiveType.VARCHAR);
-            if (t1.type == PrimitiveType.CHAR && t2.type == PrimitiveType.CHAR) {
-                return createCharType(Math.max(t1.len, t2.len));
-            }
-            return INVALID;
+            return isStr1 ? t1 : t2;
         }
 
         if (t1.isDecimal() || t2.isDecimal()) {
